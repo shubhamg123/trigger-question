@@ -1,0 +1,126 @@
+Q-1 Implement a solution such that whenever an opportunity line item is added to an opportunity a count number should be assigned to that opportunity line item. For Example, if we add 3 products in a sequence that would be like 1,2,3. Now if we delete product no - 2 and again add one more product that would be 4. It does not matter which product in which sequence is deleted. 
+Q-2 Implement a solution so that whenever an account is updated and the owner of the account is changed an email should go out with the details of the account and the number of contacts that are related to this account to the manager of the new user who is now the owner of that account as well as the manager of the old user should also get notified that this account is transferred to another manager.
+
+
+
+
+
+
+
+q1./*public class questionbymohitsir {
+    
+public static void main(list<opportunitylineitem> cx)
+    {  
+        list<id> opportunityid =new list<id>();
+        list<opportunity> toupdate =new list<opportunity>();
+     for(opportunitylineitem x:cx)
+       {
+           
+           opportunityid.add(x.opportunityid);
+       }
+       list<opportunity> x=[select id,cas8__noofproduct__c,(select id from opportunitylineitems)from opportunity where id in:opportunityid];
+        map<id,decimal> newmap=new map<id,decimal>();
+     
+       for(opportunity kl:x)
+       {
+           newmap.put(kl.id,kl.cas8__noofproduct__c);
+        
+           
+       }
+        for(opportunitylineitem xx:cx)
+        {
+            xx.put('cas8__lineitemno__c',newmap.get(xx.OpportunityId)+1);
+            decimal x1=newmap.get(xx.OpportunityId);
+            newmap.put(xx.OpportunityId,x1+1);
+        }
+        for(opportunity xyz:x)
+        {
+               xyz.put('cas8__noofproduct__c',newmap.get(xyz.id));
+            toupdate.add(xyz);
+        }
+        update toupdate;
+        
+    }
+}*/
+/*trigger opportunitylineitem on OpportunityLineItem (before insert) {
+    questionbymohitsir.main(trigger.new);
+}*/
+/*
+
+q2...public class questionbymohitsir {
+   public static list<id>  newowners=new list<id>();
+    public static    list<id> oldowners=new list<id>();
+   public static   map<string,integer> emailtocount=new map<string,integer>();
+  //   opportunity op=[select id,ownerid from opportunity where name=:opname];
+   //     user ow=[select id,manager.name,manager.id from user where  id=:op.ownerid];
+ public static void main(list<account> newlist,map<id,account> newmap,list<account> oldlist)
+ { 
+     for(account dd:newlist)
+ {  
+     id newowner=dd.ownerid;
+       newowners.add(newowner);
+ }
+    for(account dd:oldlist)
+     
+    { id oldowner=dd.ownerid;
+       oldowners.add(oldowner);
+ }list<user> newmanagers=[select id,manager.name,manager.id,manager.email from user where  id in :newowners];
+     list<user> oldmanagers=[select id,manager.name,manager.id,manager.email from user where  id in :oldowners];
+list<account> accounttonoofcontacts=[select id,(select id from contacts) from account where id in :newlist];
+     map<id,string> newownertoemailofmanager=new map<id,string>();
+     map<id,integer> countofcontacts =new map<id,integer>();
+     map<id,string> oldownertoemailofmanager=new map<id,string>();
+       for(user dd:oldmanagers)
+ {  
+    oldownertoemailofmanager.put(dd.id,dd.manager.email);
+ }
+       for(user dd:newmanagers)
+ {  
+    newownertoemailofmanager.put(dd.id,dd.manager.email);
+ }
+
+     
+ for(account sd:accounttonoofcontacts)
+ {
+     countofcontacts.put(newmap.get(sd.id).id,sd.contacts.size());
+     
+ }  integer i=0;
+     for(account ac:oldlist)
+     {
+         if(newowners[i]!=oldowners[i] && ac.get('ownerid')!=newmap.get(ac.id).ownerid)
+         {
+             
+             sendemail( newownertoemailofmanager.get(newowners[i]),countofcontacts.get(ac.id),oldownertoemailofmanager.get(newowners[i]));
+             
+         }
+         i++;
+     }
+ 
+ 
+ 
+ }
+   
+   
+   
+   public static void sendemail(string str,integer nj,string pr)
+    {
+       system.debug(nj+'hello');
+        Messaging.SingleEmailMessage message = new Messaging.SingleEmailMessage();
+message.toAddresses = new String[] { str };
+message.subject = 'hello';
+message.plainTextBody = 'This is the message body.'+nj;
+Messaging.SingleEmailMessage[] messages =   new List<Messaging.SingleEmailMessage> {message};
+Messaging.SendEmailResult[] results = Messaging.sendEmail(messages);
+          
+        Messaging.SingleEmailMessage messagesd = new Messaging.SingleEmailMessage();
+messagesd.toAddresses = new String[] { pr };
+messagesd.subject = 'hello';
+messagesd.plainTextBody = 'account owner chanfged';
+Messaging.SingleEmailMessage[] messagess =   new List<Messaging.SingleEmailMessage> {message};
+Messaging.SendEmailResult[] resultss = Messaging.sendEmail(messages);
+        
+        trigger questionbymohit on Account (before update) {
+ questionbymohitsir.main(trigger.new,trigger.newmap,trigger.old);
+} */
+    }
+}
